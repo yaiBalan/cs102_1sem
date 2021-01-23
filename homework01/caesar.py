@@ -1,10 +1,11 @@
 import typing as tp
 
+ALPHABET = 26
+
 
 def encrypt_caesar(plaintext: str, shift: int = 3) -> str:
     """
     Encrypts plaintext using a Caesar cipher.
-
     >>> encrypt_caesar("PYTHON")
     'SBWKRQ'
     >>> encrypt_caesar("python")
@@ -15,14 +16,24 @@ def encrypt_caesar(plaintext: str, shift: int = 3) -> str:
     ''
     """
     ciphertext = ""
-    # PUT YOUR CODE HERE
+    for symbol_pos in range(len(plaintext)):
+        if not plaintext[symbol_pos].isalpha():
+            ciphertext += str(plaintext[symbol_pos])
+        else:
+            if not plaintext[symbol_pos].isupper():
+                ciphertext += str(
+                    chr((ord(plaintext[symbol_pos]) - ord("a") + shift) % ALPHABET + ord("a"))
+                )
+            else:
+                ciphertext += str(
+                    chr((ord(plaintext[symbol_pos]) - ord("A") + shift) % ALPHABET + ord("A"))
+                )
     return ciphertext
 
 
 def decrypt_caesar(ciphertext: str, shift: int = 3) -> str:
     """
     Decrypts a ciphertext using a Caesar cipher.
-
     >>> decrypt_caesar("SBWKRQ")
     'PYTHON'
     >>> decrypt_caesar("sbwkrq")
@@ -33,14 +44,27 @@ def decrypt_caesar(ciphertext: str, shift: int = 3) -> str:
     ''
     """
     plaintext = ""
-    # PUT YOUR CODE HERE
+    for symbol_pos in range(len(ciphertext)):
+        if not ciphertext[symbol_pos].isalpha():
+            plaintext += str(ciphertext[symbol_pos])
+            continue
+        else:
+            if not ciphertext[symbol_pos].isupper():
+                plaintext += str(
+                    chr((ord(ciphertext[symbol_pos]) - ord("a") - shift) % ALPHABET + ord("a"))
+                )
+            else:
+                plaintext += str(
+                    chr((ord(ciphertext[symbol_pos]) - ord("A") - shift) % ALPHABET + ord("A"))
+                )
     return plaintext
 
 
-def caesar_breaker_brute_force(ciphertext: str, dictionary: tp.Set[str]) -> int:
-    """
-    Brute force breaking a Caesar cipher.
-    """
-    best_shift = 0
-    # PUT YOUR CODE HERE
-    return best_shift
+ceasar_breaker_brute_force(ciphertext: str, dictionary: tp.Set[str]) -> int:
+	best_shift = 0
+	alphabet_len = len(string.ascii_lowercase)
+	for i in range (0, alphabet_len):
+		plaintext = decrypt_ceasar(ciphertext, i)
+		if plaintext in dictionary:
+			best_shift = i
+	return best_shift
