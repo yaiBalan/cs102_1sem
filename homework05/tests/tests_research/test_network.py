@@ -2,14 +2,21 @@ import re
 import unittest
 
 import responses
-
 from research.network import ego_network
 
 
 class EgoNetworkTestCase(unittest.TestCase):
     @responses.activate
-    def test_network(self):
-        target_uids = [1, 2, 3, 4, 5]
+    def test_network(
+        self,
+    ):
+        target_uids = [
+            1,
+            2,
+            3,
+            4,
+            5,
+        ]
         responses.add(
             responses.GET,
             re.compile(
@@ -20,17 +27,27 @@ class EgoNetworkTestCase(unittest.TestCase):
                 "response": [
                     {
                         "id": 1,
-                        "common_friends": [2, 3],
+                        "common_friends": [
+                            2,
+                            3,
+                        ],
                         "common_count": 2,
                     },
                     {
                         "id": 2,
-                        "common_friends": [1, 3, 4],
+                        "common_friends": [
+                            1,
+                            3,
+                            4,
+                        ],
                         "common_count": 3,
                     },
                     {
                         "id": 3,
-                        "common_friends": [1, 2],
+                        "common_friends": [
+                            1,
+                            2,
+                        ],
                         "common_count": 2,
                     },
                     {
@@ -48,14 +65,41 @@ class EgoNetworkTestCase(unittest.TestCase):
             status=200,
         )
         expected_edges = [
-            (1, 2),
-            (1, 3),
-            (2, 1),
-            (2, 3),
-            (2, 4),
-            (3, 1),
-            (3, 2),
-            (4, 2),
+            (
+                1,
+                2,
+            ),
+            (
+                1,
+                3,
+            ),
+            (
+                2,
+                1,
+            ),
+            (
+                2,
+                3,
+            ),
+            (
+                2,
+                4,
+            ),
+            (
+                3,
+                1,
+            ),
+            (
+                3,
+                2,
+            ),
+            (
+                4,
+                2,
+            ),
         ]
         edges = ego_network(friends=target_uids)
-        self.assertEqual(set(expected_edges), set(edges))
+        self.assertEqual(
+            set(expected_edges),
+            set(edges),
+        )
