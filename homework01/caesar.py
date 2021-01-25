@@ -60,11 +60,13 @@ def decrypt_caesar(ciphertext: str, shift: int = 3) -> str:
     return plaintext
 
 
-ceasar_breaker_brute_force(ciphertext: str, dictionary: tp.Set[str]) -> int:
-	best_shift = 0
-	alphabet_len = len(string.ascii_lowercase)
-	for i in range (0, alphabet_len):
-		plaintext = decrypt_ceasar(ciphertext, i)
-		if plaintext in dictionary:
-			best_shift = i
-	return best_shift
+def caesar_breaker_brute_force(ciphertext: str, dictionary: tp.Set[str]) -> int:
+    best_shift = 0
+    alphabet_len = len(string.ascii_lowercase)
+    matches = 0
+    for i in range(0, alphabet_len):
+        try_plain = set(decrypt_caesar(ciphertext, i).split(" "))
+        if len(try_plain & dictionary) >= matches:
+            matches = len(try_plain & dictionary)
+            best_shift = i
+    return best_shift
