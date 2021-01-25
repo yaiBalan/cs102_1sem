@@ -1,3 +1,4 @@
+import string
 import typing as tp
 
 ALPHABET = 26
