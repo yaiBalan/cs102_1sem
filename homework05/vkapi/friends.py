@@ -21,6 +21,7 @@ def get_friends(
     """
     Получить список идентификаторов друзей пользователя или расширенную информацию
     о друзьях пользователя (при использовании параметра fields).
+
     :param user_id: Идентификатор пользователя, список друзей для которого нужно получить.
     :param count: Количество друзей, которое нужно вернуть.
     :param offset: Смещение, необходимое для выборки определенного подмножества друзей.
@@ -37,11 +38,15 @@ def get_friends(
             "access_token": config.VK_CONFIG["access_token"],
             "v": config.VK_CONFIG["version"],
         },
-    ).json()
-    if "response" in response:
-        data = response["response"]
-    else:
-        raise APIError
+    )
+    if response.status_code != 200:
+        raise APIError(f"Server Error: {response.status_code}")
+    resp_json = response.json()
+    if "error" in resp_json:
+        error_code = resp_json["error"]["error_code"]
+        error_msg = resp_json["error"]["error_msg"]
+        raise APIError(f"VK API Error (code {error_code}): {error_msg}")
+    data = resp_json["response"]
     return FriendsResponse(count=data["count"], items=data["items"])
 
 
@@ -62,6 +67,7 @@ def get_mutual(
 ) -> tp.Union[tp.List[int], tp.List[MutualFriends]]:
     """
     Получить список идентификаторов общих друзей между парой пользователей.
+
     :param source_uid: Идентификатор пользователя, чьи друзья пересекаются с друзьями пользователя с идентификатором target_uid.
     :param target_uid: Идентификатор пользователя, с которым необходимо искать общих друзей.
     :param target_uids: Cписок идентификаторов пользователей, с которыми необходимо искать общих друзей.
@@ -82,10 +88,15 @@ def get_mutual(
                 "access_token": config.VK_CONFIG["access_token"],
                 "v": config.VK_CONFIG["version"],
             },
-        ).json()
-        if "response" in response:
-            return response["response"]
-        raise APIError
+        )
+        if response.status_code != 200:
+            raise APIError(f"Server Error: {response.status_code}")
+        resp_json = response.json()
+        if "error" in resp_json:
+            error_code = resp_json["error"]["error_code"]
+            error_msg = resp_json["error"]["error_msg"]
+            raise APIError(f"VK API Error (code {error_code}): {error_msg}")
+        return resp_json["response"]
 
     res = []  # type: ignore
     if not target_uids:
@@ -99,18 +110,22 @@ def get_mutual(
             "friends.getMutual",
             params={
                 "source_uid": source_uid,
-                "target_uids": target_uids[pos : pos + 100],
+                "target_uids": ",".join([str(i) for i in target_uids[pos : pos + 100]]),
                 "order": order,
                 "count": count,
                 "offset": offset + pos,
                 "access_token": config.VK_CONFIG["access_token"],
                 "v": config.VK_CONFIG["version"],
             },
-        ).json()
-        if "response" in response:
-            data = response["response"]
-        else:
-            raise APIError
+        )
+        if response.status_code != 200:
+            raise APIError(f"Server Error: {response.status_code}")
+        resp_json = response.json()
+        if "error" in resp_json:
+            error_code = resp_json["error"]["error_code"]
+            error_msg = resp_json["error"]["error_msg"]
+            raise APIError(f"VK API Error (code {error_code}): {error_msg}")
+        data = resp_json["response"]
         res.extend(
             MutualFriends(  # type: ignore
                 id=info["id"],

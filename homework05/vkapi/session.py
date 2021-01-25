@@ -9,6 +9,7 @@ from urllib3.util import Retry
 class Session(requests.Session):
     """
     Сессия.
+
     :param base_url: Базовый адрес, на который будут выполняться запросы.
     :param timeout: Максимальное время ожидания ответа от сервера.
     :param max_retries: Максимальное число повторных запросов.

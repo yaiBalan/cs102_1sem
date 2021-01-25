@@ -10,7 +10,9 @@ from vkapi.wall import get_wall_execute
 
 class GetWallTestCase(unittest.TestCase):
     @responses.activate
-    def test_total_count(self):
+    def test_total_count(
+        self,
+    ):
         expected_items = [
             {
                 "id": 1,
@@ -31,7 +33,10 @@ class GetWallTestCase(unittest.TestCase):
             },
             status=200,
         )
-        wall = get_wall_execute(domain="cs102py", count=1)
+        wall = get_wall_execute(
+            domain="cs102py",
+            count=1,
+        )
         self.assertIsInstance(
             wall,
             pd.DataFrame,
@@ -49,7 +54,9 @@ class GetWallTestCase(unittest.TestCase):
         )
 
     @responses.activate
-    def test_too_many_requests(self):
+    def test_too_many_requests(
+        self,
+    ):
         responses.add(
             responses.POST,
             "https://api.vk.com/method/execute",
@@ -64,6 +71,13 @@ class GetWallTestCase(unittest.TestCase):
         start = time.time()
         with patch("vkapi.wall.get_posts_2500") as get_posts_2500:
             get_posts_2500.return_value = []
-            _ = get_wall_execute(domain="cs102py", count=6000)
+            _ = get_wall_execute(
+                domain="cs102py",
+                count=6000,
+            )
         end = time.time()
-        self.assertGreaterEqual(end - start, 2.0, msg="Слишком много запросов в секунду")
+        self.assertGreaterEqual(
+            end - start,
+            2.0,
+            msg="Слишком много запросов в секунду",
+        )

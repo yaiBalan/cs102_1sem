@@ -73,10 +73,15 @@ def get_posts_2500(
             "access_token": config.VK_CONFIG["access_token"],
             "v": config.VK_CONFIG["version"],
         },
-    ).json()
-    if "response" in response:
-        return response["response"]
-    raise APIError
+    )
+    if response.status_code != 200:
+        raise APIError(f"Server Error: {response.status_code}")
+    resp_json = response.json()
+    if "error" in resp_json:
+        error_code = resp_json["error"]["error_code"]
+        error_msg = resp_json["error"]["error_msg"]
+        raise APIError(f"VK API Error (code {error_code}): {error_msg}")
+    return resp_json["response"]
 
 
 def get_wall_execute(
@@ -92,7 +97,9 @@ def get_wall_execute(
 ) -> pd.DataFrame:
     """
     Возвращает список записей со стены пользователя или сообщества.
+
     @see: https://vk.com/dev/wall.get
+
     :param owner_id: Идентификатор пользователя или сообщества, со стены которого необходимо получить записи.
     :param domain: Короткий адрес пользователя или сообщества.
     :param offset: Смещение, необходимое для выборки определенного подмножества записей.
@@ -123,15 +130,20 @@ def get_wall_execute(
             "access_token": config.VK_CONFIG["access_token"],
             "v": config.VK_CONFIG["version"],
         },
-    ).json()
-    if "error" in response:
-        raise APIError
-    posts = response["response"]
+    )
+    if response.status_code != 200:
+        raise APIError(f"Server Error: {response.status_code}")
+    resp_json = response.json()
+    if "error" in resp_json:
+        error_code = resp_json["error"]["error_code"]
+        error_msg = resp_json["error"]["error_msg"]
+        raise APIError(f"VK API Error (code {error_code}): {error_msg}")
+    posts = resp_json["response"]
 
-    if response["response"]["count"] - offset > count and count != 0:
+    if posts["count"] - offset > count and count != 0:
         max_count = count
     else:
-        max_count = response["response"]["count"] - offset
+        max_count = posts["count"] - offset
 
     if max_count == 0:
         return json_normalize(posts["items"])
